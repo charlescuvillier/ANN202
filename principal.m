@@ -85,8 +85,8 @@ end
 %resolution 
 UU_bar = KK_int\LL_int;
 UU_bar = [UU_bar;zeros(Nbaretes,1)];
-[UU_som,Coorneu2] = Bar_to_neu(UU_bar,Coorneu,Coorbar,Numtri);
-affiche(UU_som, Numtri, Coorneu2, sprintf('Neumann - %s', nom_maillage));
+[UU_som,Coorneu2,Numtri2] = Bar_to_neu(UU_bar,Coorneu,Coorbar,Numtri);
+affiche(UU_som, Numtri2, Coorneu2, sprintf('Neumann - %s', nom_maillage));
 
 %solution exacte
 UU_sol = zeros(size(Coorbar,[1]),1);
@@ -94,8 +94,8 @@ for i=1:Nbaretes_int+Nbaretes
     x=Coorbar(i,1);y=Coorbar(i,2);
     UU_sol(i) = sin(pi*y)*sin(pi*x);
 end
-[UU_solus,Coorneu3] = Bar_to_neu(UU_sol,Coorneu,Coorbar,Numtri);
-affiche(UU_solus, Numtri_bar, Coorneu3, sprintf('Neumann - %s', nom_maillage));
+[UU_solus,Coorneu3,Numtri2] = Bar_to_neu(UU_sol,Coorneu,Coorbar,Numtri);
+affiche(UU_solus, Numtri2, Coorneu3, sprintf('Neumann - %s', nom_maillage));
 
 %Calcul de l'erreur
 %erreur ||u-uh|| :
