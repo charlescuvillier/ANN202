@@ -5,7 +5,4 @@ bool = 1;
 for i=1:N(1)
     bool = bool * max(~ismember(F,Numaretes(i,:)));
 end
-if bool ==1
-    bool =0;
-else bool =1;
-end
+bool = ~bool;

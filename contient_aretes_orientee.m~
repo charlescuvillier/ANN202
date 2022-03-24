@@ -1,0 +1,24 @@
+function[bool] = contient_aretes_orientee(F,Numaretes)
+%renvoie true si la face F est dans l'ensemble d'aretes Numaretes
+bool = 0;
+
+for i=1:size(Numaretes,[1])
+    if (F == Numaretes(i,1:2))
+        return 1;
+    else if (F == Numaretes(i,2:3))
+            bool = 1
+        end
+    else if (F == [Numaretes(i,3) Numaretes(i,1)])
+            return 1
+        end
+    else if (F == [Numaretes(i,1) Numaretes(i,3)])
+            return 2
+        end
+    else if (F == [Numaretes(i,3) Numaretes(i,2)])
+            return 2
+        end
+    else if (F == [Numaretes(i,2) Numaretes(i,1)])
+            return 2
+        end
+    end
+end

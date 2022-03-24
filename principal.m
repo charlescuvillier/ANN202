@@ -28,43 +28,42 @@ LL_int = zeros(Nbaretes_int,1);     % vecteur second membre
 for i=1:Nbaretes_int
     %on cherche les 2 simplexes qui contiennent l'arete
     F_i = Numaretes_int(i,:);
-    KK = trouve_simplexes(F_i,Numtri);
-    K1 = KK(1,:); K2 = KK(2,:);
+    [K1 K2] = trouve_simplexes(F_i,Numtri);
     %premiere face
     F = K1(1:2);
-    ind = trouve_num_arete(F',Numaretes_int);
-    if ~(ind ==0) %si ind vaut 0 F' est une arete du bord
-        KK_int(i,ind)= KK_int(i,ind) + prod_scal_phi_FF2(F_i,F,K1,Coorneu);
+    ind = trouve_num_arete(F,Numaretes_int);
+    if (ind ~=0) %si ind vaut 0 F' est une arete du bord
+        KK_int(i,ind)= KK_int(i,ind) + prod_scal_phi_FF(F_i,F,K1,Coorneu);
     end
     %deuxieme face
     F = [K1(2) K1(3)];
-    ind = trouve_num_arete(F',Numaretes_int);
-    if ~(ind ==0) %si ind vaut 0 F' est une arete du bord
-        KK_int(i,ind)=KK_int(i,ind) + prod_scal_phi_FF2(F_i,F,K1,Coorneu);
+    ind = trouve_num_arete(F,Numaretes_int);
+    if (ind ~=0) %si ind vaut 0 F' est une arete du bord
+        KK_int(i,ind)=KK_int(i,ind) + prod_scal_phi_FF(F_i,F,K1,Coorneu);
     end
     %troisieme face
     F = [K1(3) K1(1)];
     ind = trouve_num_arete(F,Numaretes_int);
-    if ~(ind ==0) %si ind vaut 0 F' est une arete du bord
-        KK_int(i,ind)=KK_int(i,ind) + prod_scal_phi_FF2(F_i,F,K1,Coorneu);
+    if (ind ~=0) %si ind vaut 0 F' est une arete du bord
+        KK_int(i,ind)=KK_int(i,ind) + prod_scal_phi_FF(F_i,F,K1,Coorneu);
     end
     %premiere face de K2
     F = [K2(1) K2(2)];
     ind = trouve_num_arete(F,Numaretes_int);
-    if ~(ind ==0) %si ind vaut 0 F' est une arete du bord
-        KK_int(i,ind)=KK_int(i,ind) + prod_scal_phi_FF2(F_i,F,K2,Coorneu);
+    if (ind ~=0) %si ind vaut 0 F' est une arete du bord
+        KK_int(i,ind)=KK_int(i,ind) + prod_scal_phi_FF(F_i,F,K2,Coorneu);
     end
     %deuxieme face de K2
     F = [K2(2) K2(3)];
     ind = trouve_num_arete(F,Numaretes_int);
-    if ~(ind ==0) %si ind vaut 0 F' est une arete du bord
-        KK_int(i,ind)=KK_int(i,ind) + prod_scal_phi_FF2(F_i,F,K2,Coorneu);
+    if (ind ~=0) %si ind vaut 0 F' est une arete du bord
+        KK_int(i,ind)=KK_int(i,ind) + prod_scal_phi_FF(F_i,F,K2,Coorneu);
     end
     %troisieme face de K2
     F = [K2(3) K2(1)];
-    ind = trouve_num_arete(F',Numaretes_int);
-    if ~(ind ==0) %si ind vaut 0 F' est une arete du bord
-        KK_int(i,ind)=KK_int(i,ind) + prod_scal_phi_FF2(F_i,F,K2,Coorneu);
+    ind = trouve_num_arete(F,Numaretes_int);
+    if (ind ~=0) %si ind vaut 0 F' est une arete du bord
+        KK_int(i,ind)=KK_int(i,ind) + prod_scal_phi_FF(F_i,F,K2,Coorneu);
     end
 end
 
@@ -73,8 +72,7 @@ end
 %   matrice LL_int
 for i=1:Nbaretes_int
     F_i = Numaretes_int(i,:);
-    KK = trouve_simplexes(F_i,Numtri);
-    K1 = KK(1,:); K2 = KK(2,:);
+    [K1, K2] = trouve_simplexes(F_i,Numtri);
     x1 = Coorneu(F_i(1),:);
     x2 = Coorneu(F_i(2),:);
     x_f = (x1 + x2)/2;
