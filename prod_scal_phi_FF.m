@@ -21,14 +21,14 @@ if or_F * or_F1 == -1
     F = [F(2) F(1)]
 end
 
-S1 = Coorneu(F(1),:)
-S2 = Coorneu(F(2),:)
+S1 = Coorneu(F(1),:);
+S2 = Coorneu(F(2),:);
 S11= Coorneu(F1(1),:);
 S21= Coorneu(F1(2),:);
 
 norm_K = norme_simplexe(K,Coorneu);
 
-prod = (1/norm_K)*dot(S2-S1,S21-11);
+prod = (1/norm_K)*dot(S2-S1,S21-S11);
 
 
 

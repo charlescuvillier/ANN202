@@ -83,7 +83,7 @@ end
 %resolution 
 UU_bar = KK_int\LL_int;
 UU_bar = [UU_bar;zeros(Nbaretes,1)];
-[UU_som,Coorneu2,Numtri2] = Bar_to_neu(UU_bar,Coorneu,Coorbar,Numtri);
+[UU_som,Coorneu2,Numtri2] = Bar_to_neu(UU_bar2,Coorneu,Coorbar,Numtri);
 affiche(UU_som, Numtri2, Coorneu2, sprintf('Neumann - %s', nom_maillage));
 
 %solution exacte
@@ -99,7 +99,6 @@ affiche(UU_solus, Numtri2, Coorneu3, sprintf('Neumann - %s', nom_maillage));
 %erreur ||u-uh|| :
 erreur_H1= sqrt((UU_sol(1:Nbaretes_int)-UU_bar(1:Nbaretes_int))'*KK_int*(UU_sol(1:Nbaretes_int)-UU_bar(1:Nbaretes_int)))
 
-Nbaretes_int
 
 
 
