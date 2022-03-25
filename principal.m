@@ -1,6 +1,6 @@
 
 
-maillage = 2;
+maillage = 1;
 
 % Donnees du probleme.
 switch maillage
@@ -37,7 +37,7 @@ LL_int = zeros(Nbaretes_int,1);     % vecteur second membre
 for i=1:Nbaretes_int
     %on cherche les 2 simplexes qui contiennent l'arete
     F_i = Numaretes_int(i,:);
-    [K1 K2] = trouve_simplexes(F_i,Numtri);
+    [K1,K2] = trouve_simplexes(F_i,Numtri);
     %premiere face
     F = K1(1:2);
     ind = trouve_num_arete(F,Numaretes_int);
@@ -78,7 +78,31 @@ end
 
 %   Matrice KK_int_ext
 
-
+if maillage == 2
+    KK_int_ext = zeros(Nbaretes_int,Nbaretes);
+    for i=1:Nbaretes
+        F_i = Numaretes(i,:);
+        [K1,K2] = trouve_simplexes(F_i,Numtri);
+        %premiere face
+        F = K1(1:2);
+        ind = trouve_num_arete(F,Numaretes_int);
+        if (ind ~=0) %ind vaut 0 si F est une arete du bord ie F = F_i
+            KK_int_ext(ind,i) = prod_scal_phi_FF(F_i,F,K1,Coorneu);
+        end
+        %deuxieme face
+        F = [K1(2) K1(3)];
+        ind = trouve_num_arete(F,Numaretes_int);
+        if (ind ~=0) %ind vaut 0 si F est une arete du bord ie F = F_i
+            KK_int_ext(ind,i) = prod_scal_phi_FF(F_i,F,K1,Coorneu);
+        end
+        %troisieme face
+        F = [K1(3) K1(1)];
+        ind = trouve_num_arete(F,Numaretes_int);
+        if (ind ~=0) %ind vaut 0 si F est une arete du bord ie F = F_i
+            KK_int_ext(ind,i) = prod_scal_phi_FF(F_i,F,K1,Coorneu);
+        end
+    end
+end
 
 %   matrice LL_int
 switch maillage
@@ -94,6 +118,13 @@ switch maillage
             LL_int(i) = (1/3)*(norm_K1 + norm_K2)*f(maillage,x_f(1),x_f(2));
         end
     case 2
+        UU_bord = zeros(Nbaretes,1);
+        for i=1:Nbaretes
+            x=Coorbar(Nbaretes_int+i,1);y=Coorbar(Nbaretes_int+i,2);
+            UU_bord(i) = u_bord(maillage,x,y);
+        end
+        LL_int = - KK_int_ext * UU_bord;
+end
         
 %resolution 
 UU_int = KK_int\LL_int;
@@ -110,10 +141,19 @@ end
 affiche(UU_som, Numtri2, Coorneu2, sprintf('Neumann - %s', nom_maillage));
 
 %solution exacte
-UU_sol = zeros(size(Coorbar,[1]),1);
-for i=1:Nbaretes_int+Nbaretes
-    x=Coorbar(i,1);y=Coorbar(i,2);
-    UU_sol(i) = sin(pi*y)*sin(pi*x);
+switch maillage
+    case 1
+        UU_sol = zeros(size(Coorbar,[1]),1);
+        for i=1:Nbaretes_int+Nbaretes
+            x=Coorbar(i,1);y=Coorbar(i,2);
+            UU_sol(i) = sin(pi*y)*sin(pi*x);
+        end
+    case 2
+        UU_sol = zeros(size(Coorbar,[1]),1);
+        for i=1:Nbaretes_int+Nbaretes
+            x=Coorbar(i,1);y=Coorbar(i,2);
+            UU_sol(i) = u_bord(maillage,x,y);
+        end
 end
 [UU_solus,Coorneu2,Numtri2] = Bar_to_neu(UU_sol,Coorneu,Coorbar,Numtri);
 affiche(UU_solus, Numtri2, Coorneu2, sprintf('Neumann - %s', nom_maillage));
