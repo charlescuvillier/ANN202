@@ -138,33 +138,67 @@ end
 
  UU_bar = [UU_int;UU_ext];
 [UU_som,Coorneu2,Numtri2] = Bar_to_neu(UU_bar,Coorneu,Coorbar,Numtri);
-affiche(UU_som, Numtri2, Coorneu2, sprintf('Neumann - %s', nom_maillage));
+affiche(UU_som, Numtri2, Coorneu2, sprintf('Solution approchée - %s', nom_maillage));
 
-%solution exacte
-switch maillage
-    case 1
-        UU_sol = zeros(size(Coorbar,[1]),1);
-        for i=1:Nbaretes_int+Nbaretes
-            x=Coorbar(i,1);y=Coorbar(i,2);
-            UU_sol(i) = sin(pi*y)*sin(pi*x);
-        end
-    case 2
-        UU_sol = zeros(size(Coorbar,[1]),1);
-        for i=1:Nbaretes_int+Nbaretes
-            x=Coorbar(i,1);y=Coorbar(i,2);
-            UU_sol(i) = u_bord(maillage,x,y);
-        end
+%solution exacte pour le calcul de l'erreur
+UU_ex_bar = zeros(size(Coorbar,[1]),1);
+for i=1:Nbaretes_int+Nbaretes
+    x=Coorbar(i,1);y=Coorbar(i,2);
+     UU_ex(i) = u_exact(maillage,x,y);
 end
-[UU_solus,Coorneu2,Numtri2] = Bar_to_neu(UU_sol,Coorneu,Coorbar,Numtri);
-affiche(UU_solus, Numtri2, Coorneu2, sprintf('Neumann - %s', nom_maillage));
+%solution exacte pour l'affichage
+UU_ex_som = zeros(Nbpt,1);
+for i=1:Nbpt
+    x=Coorneu(i,1);y=Coorneu(i,2);
+     UU_ex_som(i) = u_exact(maillage,x,y);
+end
+
+affiche(UU_ex_som, Numtri, Coorneu, sprintf('Solution exacte - %s', nom_maillage));
 
 %Calcul de l'erreur
 %erreur ||u-uh|| :
 
-erreur_H1= sqrt((UU_sol(1:Nbaretes_int)-UU_bar(1:Nbaretes_int))'*KK_int*(UU_sol(1:Nbaretes_int)-UU_bar(1:Nbaretes_int)))
+erreur_H1= sqrt((UU_ex(1:Nbaretes_int)-UU_bar(1:Nbaretes_int))'*KK_int*(UU_ex(1:Nbaretes_int)-UU_bar(1:Nbaretes_int)))
 %cardinal de V^nc_h1 :
 Nbaretes_int
 
+%reconstruction du potentiel
+Sh = zeros(Nbpt,1);
+Card_Tx = zeros(Nbpt,1); %nombre de triangles contenant le sommet x
+
+for i=1:size(Numtri,[1])
+    for j=1:3
+        if Refneu(Numtri(i,j)) == 0  %points intérieurs
+            Sh(Numtri(i,j)) = Sh(Numtri(i,j)) + UU_som(3*(i-1)+j);
+            Card_Tx(Numtri(i,j)) = Card_Tx(Numtri(i,j)) + 1;
+        end
+    end
+end
+for i=1:Nbpt 
+    if Sh(i) ~= 0   %Sh(i)~=0 implique Card_Tx ~= 0   
+        Sh(i) = Sh(i)/Card_Tx(i);
+    else        %sur le bord, le potentiel est égal à la condition de Dirichlet
+        Sh(i) = u_bord(maillage,Coorneu(i,1),Coorneu(i,2));
+    end
+end
+
+affiche(Sh, Numtri, Coorneu, sprintf('Reconstruction du potentiel - %s', nom_maillage));
+
+Sh_bar = 
+
+err_pot = (UU_ex(1:Nbaretes_int)-UU_bar(1:Nbaretes_int))'*KK_int*(UU_ex(1:Nbaretes_int)-UU_bar(1:Nbaretes_int));
+
+%reconstruction du flux équilibré
+sigma = zeros(3*Nbtri,2);
+for i=1:Nbtri
+    x1 = Coorneu(Numtri(i,1));
+    x2 = Coorneu(Numtri(i,2));
+    x3 = Coorneu(Numtri(i,3));
+    x_bar = (x1 + x2 + x3)/3;
+    for j=1:3
+
+    end
+end
 
 
-
+%estimations d'erreurs à posteriori

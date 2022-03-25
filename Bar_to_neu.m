@@ -4,7 +4,7 @@ UU_som = zeros(3*size(Numtri,[1]),1);
 Coorneu2 = zeros(3*size(Numtri,[1]),2);
 Numtri2 = zeros(size(Numtri));
 
-for i=1:size(Numtri,[1])
+for i=1:size(Numtri,(1))
     for j=1:3
         Coorneu2(3*(i-1)+j,:) = Coorneu(Numtri(i,j),:);
         Numtri2(i,j) = 3*(i-1)+j;
