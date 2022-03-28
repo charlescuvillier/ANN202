@@ -1,8 +1,8 @@
-
-
-maillage = 2; % 1 = carré ; 2 = Dirichlet non homogène
+close();
 
 % Donnees du probleme.
+maillage = 2; % 1 = carré ; 2 = Dirichlet non homogène
+
 switch maillage
     case 1
         nom_maillage = 'geomCarre.msh';
@@ -80,7 +80,7 @@ end
 %   Matrice KK_int_ext
 
 if maillage == 2
-    KK_int_ext = zeros(Nbaretes_int,Nbaretes);
+    KK_int_ext = sparse(Nbaretes_int,Nbaretes);
     for i=1:Nbaretes
         F_i = Numaretes(i,:);
         [K1,K2] = trouve_simplexes(F_i,Numtri);
@@ -209,39 +209,52 @@ for i=1:Nbtri
     end
 end
 
-switch maillage
-    case 1
-        aire_maillage = 1;
-    case 2
-        aire_maillage = 3;
-end
-h = sqrt(2*aire_maillage/Nbtri); % h approché
-fe = 3; %nombre de pas dans un triangle environ
-p = h/fe; %pas 
-
-N = floor(maillage/p);
-sigma = zeros(N,N);
-for i=1:N
-    for j=1:N
-        sigma(i,j) = 
-    end
-end
-
 
 %estimations d'erreurs à posteriori
-
-err_flux = 0;
+%erreur flux
+err_flux_tri = zeros(Nbtri,1);
 for i=1:Nbtri
-    norm_fh_K = 0;
     x1 = Coorbar(Numtri_bar(i,1),:);
     x2 = Coorbar(Numtri_bar(i,2),:);
     x3 = Coorbar(Numtri_bar(i,3),:);
     x_bar = (x1 + x2 + x3)/3;  %barycentre des centres des faces=barycentre des sommets
     f_moy = (f(maillage,x1(1),x1(2)) + f(maillage,x2(1),x2(2)) + f(maillage,x3(1),x3(2)))/3;
-    norm_fh_K = f_moy/12 *(dot(x1-x_bar,x1-x_bar) + dot(x2-x_bar,x2-x_bar) + dot(x3-x_bar,x3-x_bar));
-    err_flux = err_flux + norm_fh_K ;
+    err_flux_tri(i) = sqrt( f_moy/12 *(dot(x1-x_bar,x1-x_bar) + dot(x2-x_bar,x2-x_bar) + dot(x3-x_bar,x3-x_bar)));
 end
 
-eta = sqrt(err_pot^2 + err_flux)
+err_flux = norm(err_flux_tri);
+%erreur du potentiel
+err_pot_tri = zeros(Nbtri,1);
+
+for i=1:Nbtri
+    K = Numtri_bar(i,:);
+    KK = [KK_int zeros(Nbaretes_int,Nbaretes) ; zeros(Nbaretes,Nbaretes_int) zeros(Nbaretes,Nbaretes)];
+    Sh_U = [Sh_bar; zeros(Nbaretes,1)] - UU_bar;
+    Sh_U_K = Sh_U([K(1),K(2),K(3)]);
+    KK_K = KK([K(1),K(2),K(3)],[K(1),K(2),K(3)]);
+    err_pot_tri(i) = sqrt( (Sh_U_K)'*KK_K*Sh_U_K );
+end
 
 
+%erreur H1
+err_H1 = zeros(Nbtri,1);
+
+for i=1:Nbtri
+    K = Numtri_bar(i,:);
+    KK = [KK_int zeros(Nbaretes_int,Nbaretes) ; zeros(Nbaretes,Nbaretes_int) zeros(Nbaretes,Nbaretes)];
+    U_Uh_K = UU_ex_bar([K(1),K(2),K(3)])-UU_bar([K(1),K(2),K(3)]);
+    KK_K = KK([K(1),K(2),K(3)],[K(1),K(2),K(3)]);
+    err_H1(i) = sqrt( (U_Uh_K)'*KK_K*U_Uh_K );
+end
+%err_flux
+
+eta_tri = (err_pot_tri.^2 + err_flux_tri.^2).^(0.5);
+eta = norm(eta_tri);
+
+[eta_tri2,Numtri2,Coorneu2] = affichage_exo_4(eta_tri,Coorneu,Numtri);
+
+affiche(eta_tri2, Numtri2, Coorneu2, sprintf('Eta par triangle - %s',  nom_maillage));
+
+[err_H1_2,Numtri2,Coorneu2] = affichage_exo_4(err_H1,Coorneu,Numtri);
+
+affiche(err_H1_2, Numtri2, Coorneu2, sprintf('Erreur H1 par triangle - %s',  nom_maillage));
