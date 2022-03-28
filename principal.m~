@@ -1,6 +1,6 @@
 
 
-maillage = 2;
+maillage = 2; % 1 = carré ; 2 = Dirichlet non homogène
 
 % Donnees du probleme.
 switch maillage
@@ -74,6 +74,7 @@ for i=1:Nbaretes_int
     if (ind ~=0) %si ind vaut 0 F' est une arete du bord
         KK_int(i,ind)=KK_int(i,ind) + prod_scal_phi_FF(F_i,F,K2,Coorneu);
     end
+    
 end
 
 %   Matrice KK_int_ext
@@ -125,7 +126,7 @@ switch maillage
         end
         LL_int = - KK_int_ext * UU_bord;
 end
-        
+       
 %resolution 
 UU_int = KK_int\LL_int;
 
@@ -144,7 +145,7 @@ affiche(UU_som, Numtri2, Coorneu2, sprintf('Solution approchée - %s', nom_maill
 UU_ex_bar = zeros(size(Coorbar,[1]),1);
 for i=1:Nbaretes_int+Nbaretes
     x=Coorbar(i,1);y=Coorbar(i,2);
-     UU_ex(i) = u_exact(maillage,x,y);
+     UU_ex_bar(i) = u_exact(maillage,x,y);
 end
 %solution exacte pour l'affichage
 UU_ex_som = zeros(Nbpt,1);
@@ -158,11 +159,13 @@ affiche(UU_ex_som, Numtri, Coorneu, sprintf('Solution exacte - %s', nom_maillage
 %Calcul de l'erreur
 %erreur ||u-uh|| :
 
-erreur_H1= sqrt((UU_ex(1:Nbaretes_int)-UU_bar(1:Nbaretes_int))'*KK_int*(UU_ex(1:Nbaretes_int)-UU_bar(1:Nbaretes_int)))
+erreur_H1= sqrt((UU_ex_bar(1:Nbaretes_int)-UU_bar(1:Nbaretes_int))'*KK_int*(UU_ex_bar(1:Nbaretes_int)-UU_bar(1:Nbaretes_int)));
 %cardinal de V^nc_h1 :
 Nbaretes_int
+erreur_H1
 
 %reconstruction du potentiel
+%Sh pour l'affichage
 Sh = zeros(Nbpt,1);
 Card_Tx = zeros(Nbpt,1); %nombre de triangles contenant le sommet x
 
@@ -184,9 +187,15 @@ end
 
 affiche(Sh, Numtri, Coorneu, sprintf('Reconstruction du potentiel - %s', nom_maillage));
 
-Sh_bar = 
+%Sh pour le calcul de l'erreur
+Sh_bar = zeros(Nbaretes_int,1); 
+for i=1:Nbaretes_int
+    Sh_bar(i) = (Sh(Numaretes_int(i,1))+Sh(Numaretes_int(i,2)))/2;
+end
 
-err_pot = (UU_ex(1:Nbaretes_int)-UU_bar(1:Nbaretes_int))'*KK_int*(UU_ex(1:Nbaretes_int)-UU_bar(1:Nbaretes_int));
+%erreur du potentiel reconstruit
+err_pot = sqrt((Sh_bar-UU_bar(1:Nbaretes_int))'*KK_int*(Sh_bar-UU_bar(1:Nbaretes_int)));
+
 
 %reconstruction du flux équilibré
 sigma = zeros(3*Nbtri,2);
@@ -200,5 +209,23 @@ for i=1:Nbtri
     end
 end
 
+h = max([norm(Coorneu(arete_int(:,1))
+
 
 %estimations d'erreurs à posteriori
+
+err_flux = 0;
+for i=1:Nbtri
+    norm_fh_K = 0;
+    x1 = Coorbar(Numtri_bar(i,1),:);
+    x2 = Coorbar(Numtri_bar(i,2),:);
+    x3 = Coorbar(Numtri_bar(i,3),:);
+    x_bar = (x1 + x2 + x3)/3;  %barycentre des centres des faces=barycentre des sommets
+    f_moy = (f(maillage,x1(1),x1(2)) + f(maillage,x2(1),x2(2)) + f(maillage,x3(1),x3(2)))/3;
+    norm_fh_K = f_moy/12 *(dot(x1-x_bar,x1-x_bar) + dot(x2-x_bar,x2-x_bar) + dot(x3-x_bar,x3-x_bar));
+    err_flux = err_flux + norm_fh_K ;
+end
+
+eta = sqrt(err_pot^2 + err_flux)
+
+

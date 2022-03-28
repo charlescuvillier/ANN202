@@ -1,6 +1,6 @@
 Mesh.MshFileVersion = 2.2;
 // definition du pas du maillage
-h = 0.5;
+h = 0.4;
 // définition des points (en 3D, raison pour laquelle il y a un 0 en z)
 Point(1) = {0, 0, 0, h};
 Point(2) = {1, 0, 0, h};

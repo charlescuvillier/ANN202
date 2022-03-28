@@ -18,7 +18,7 @@ end
 %signe que le produit scalaire des faces
 
 if or_F * or_F1 == -1
-    F = [F(2) F(1)]
+    F = [F(2) F(1)];
 end
 
 S1 = Coorneu(F(1),:);
